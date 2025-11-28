@@ -1,6 +1,8 @@
-# 📋 Sistema de Gestión de Recibos de Sueldo con Firma Electrónica
+# � Sistema de Gestión de Recibos de Sueldo con Firma Electrónica
 
-Sistema completo para estudios contables que permite **enviar y firmar recibos de sueldo digitalmente con validez legal**. Desarrollado con Next.js 14, TypeScript, Prisma y PostgreSQL.
+Sistema completo para estudios contables que permite **enviar y firmar recibos de sueldo digitalmente con validez legal**. Desarrollado con Next.js 14 y TypeScript.
+
+> 🎯 **Demo Hardcodeada**: Actualmente todo el sistema funciona con datos hardcodeados para facilitar la demostración. No requiere base de datos para funcionar.
 
 ## ✨ Características Principales
 
