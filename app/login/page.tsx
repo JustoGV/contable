@@ -1,53 +1,36 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { signIn } from 'next-auth/react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { loginUser } from '@/lib/users'
 
 export default function LoginPage() {
   const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [formData, setFormData] = useState({
     username: '',
     password: ''
   })
 
-  // Limpiar todas las cookies al cargar
-  useEffect(() => {
-    // Eliminar todas las cookies relacionadas con next-auth
-    document.cookie.split(";").forEach((c) => {
-      document.cookie = c
-        .replace(/^ +/, "")
-        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-    });
-  }, [])
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  // SIN async, SIN await, SIN fetch - SOLO localStorage
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
     setError('')
 
-    try {
-      const result = await signIn('credentials', {
-        username: formData.username,
-        password: formData.password,
-        redirect: false
-      })
+    const user = loginUser(formData.username, formData.password)
 
-      if (result?.error) {
-        setError('Usuario o contraseña incorrectos')
+    if (user) {
+      // Redirigir según el rol
+      if (user.role === 'ADMIN') {
+        router.push('/admin')
       } else {
-        router.push('/dashboard')
-        router.refresh()
+        router.push('/employee')
       }
-    } catch (error) {
-      setError('Error al iniciar sesión')
-    } finally {
-      setIsLoading(false)
+    } else {
+      setError('Usuario o contraseña incorrectos')
     }
   }
 
@@ -77,7 +60,6 @@ export default function LoginPage() {
               onChange={(e) => setFormData({ ...formData, username: e.target.value })}
               placeholder="usuario"
               required
-              disabled={isLoading}
             />
             
             <Input
@@ -87,15 +69,13 @@ export default function LoginPage() {
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               placeholder="••••••••"
               required
-              disabled={isLoading}
             />
             
             <Button 
               type="submit" 
               className="w-full"
-              disabled={isLoading}
             >
-              {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+              Iniciar Sesión
             </Button>
           </form>
         </CardContent>

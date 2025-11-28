@@ -1,12 +1,28 @@
-import { auth } from "@/auth"
-import { redirect } from "next/navigation"
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { getCurrentUser } from '@/lib/users'
 import UploadReceipts from "@/components/admin/UploadReceipts"
 
-export default async function UploadPage() {
-  const session = await auth()
+// SIN async, SIN await - SOLO hardcoded
+export default function UploadPage() {
+  const router = useRouter()
+  const [user, setUser] = useState<any>(null)
 
-  if (!session || session.user.role !== 'ADMIN') {
-    redirect('/login')
+  useEffect(() => {
+    const currentUser = getCurrentUser()
+    
+    if (!currentUser || currentUser.role !== 'ADMIN') {
+      router.push('/login')
+      return
+    }
+
+    setUser(currentUser)
+  }, [router])
+
+  if (!user) {
+    return <div className="min-h-screen flex items-center justify-center">Cargando...</div>
   }
 
   // Datos hardcodeados de empleados
@@ -43,5 +59,5 @@ export default async function UploadPage() {
     }
   ]
 
-  return <UploadReceipts employees={employees} companyId={session.user.companyId || 'company-001'} />
+  return <UploadReceipts employees={employees} companyId="company-001" />
 }

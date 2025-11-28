@@ -146,7 +146,8 @@ export default function SignReceipt({ receipt, userId }: SignReceiptProps) {
     reader.readAsDataURL(file)
   }
 
-  const handleSign = async () => {
+  // SIN async, SIN await, SIN fetch - SOLO simulación
+  const handleSign = () => {
     if (!signatureData) {
       alert('Por favor, dibuja tu firma primero')
       return
@@ -154,28 +155,13 @@ export default function SignReceipt({ receipt, userId }: SignReceiptProps) {
 
     setIsSigning(true)
 
-    try {
-      const response = await fetch(`/api/receipts/${receipt.id}/sign`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          userId,
-          signature: signatureData 
-        })
-      })
-
-      if (response.ok) {
-        setShowSignModal(false)
-        router.push('/employee?signed=true')
-        router.refresh()
-      } else {
-        throw new Error('Error al firmar')
-      }
-    } catch (error) {
-      alert('Error al firmar el recibo. Intenta nuevamente.')
-    } finally {
+    // Simular firma (sin fetch)
+    setTimeout(() => {
+      setShowSignModal(false)
       setIsSigning(false)
-    }
+      alert('¡Recibo firmado exitosamente!')
+      router.push('/employee?signed=true')
+    }, 1000)
   }
 
   const alreadySigned = receipt.status === 'SIGNED'

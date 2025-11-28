@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { signOut } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import { logoutUser } from '@/lib/users'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -44,6 +45,13 @@ interface AdminDashboardProps {
 
 export default function AdminDashboard({ user, stats, recentReceipts }: AdminDashboardProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const router = useRouter()
+
+  // SIN async - SOLO logout simple
+  const handleLogout = () => {
+    logoutUser()
+    router.push('/login')
+  }
 
   const statCards = [
     {
@@ -121,7 +129,7 @@ export default function AdminDashboard({ user, stats, recentReceipts }: AdminDas
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => signOut({ callbackUrl: '/login' })}
+                onClick={handleLogout}
               >
                 <LogOut size={18} className="mr-2" />
                 Salir

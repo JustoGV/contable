@@ -1,11 +1,9 @@
-import { auth } from "@/auth"
-import { redirect } from "next/navigation"
-import { notFound } from "next/navigation"
-import SignReceipt from "@/components/employee/SignReceipt"
+'use client'
 
-interface PageProps {
-  params: Promise<{ id: string }>
-}
+import { useEffect, useState } from 'react'
+import { useRouter, useParams } from 'next/navigation'
+import { getCurrentUser } from '@/lib/users'
+import SignReceipt from "@/components/employee/SignReceipt"
 
 // Recibos hardcodeados
 const hardcodedReceipts: Record<string, any> = {
@@ -53,25 +51,36 @@ const hardcodedReceipts: Record<string, any> = {
   }
 }
 
-export default async function ReceiptPage({ params }: PageProps) {
-  const session = await auth()
+// SIN async, SIN await - SOLO hardcoded
+export default function ReceiptPage() {
+  const router = useRouter()
+  const params = useParams()
+  const [user, setUser] = useState<any>(null)
+  const [receipt, setReceipt] = useState<any>(null)
 
-  if (!session || session.user.role !== 'EMPLOYEE') {
-    redirect('/login')
+  useEffect(() => {
+    const currentUser = getCurrentUser()
+    
+    if (!currentUser || currentUser.role !== 'EMPLOYEE') {
+      router.push('/login')
+      return
+    }
+
+    const id = params.id as string
+    const foundReceipt = hardcodedReceipts[id]
+
+    if (!foundReceipt) {
+      router.push('/employee')
+      return
+    }
+
+    setUser(currentUser)
+    setReceipt(foundReceipt)
+  }, [router, params.id])
+
+  if (!user || !receipt) {
+    return <div className="min-h-screen flex items-center justify-center">Cargando...</div>
   }
 
-  const { id } = await params
-
-  const receipt = hardcodedReceipts[id]
-
-  if (!receipt) {
-    notFound()
-  }
-
-  // Verificar que el recibo pertenece al empleado
-  if (receipt.employee.email !== session.user.email) {
-    redirect('/employee')
-  }
-
-  return <SignReceipt receipt={receipt} userId={session.user.id} />
+  return <SignReceipt receipt={receipt} userId={user.id} />
 }

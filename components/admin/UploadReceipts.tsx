@@ -81,7 +81,8 @@ export default function UploadReceipts({ employees, companyId }: UploadReceiptsP
     }
   }
 
-  const handleSubmit = async () => {
+  // SIN async, SIN await, SIN fetch - SOLO simulación
+  const handleSubmit = () => {
     // Validar que todos los archivos tengan empleado asignado
     const invalid = mappings.filter(m => !m.employeeId)
     if (invalid.length > 0) {
@@ -92,57 +93,23 @@ export default function UploadReceipts({ employees, companyId }: UploadReceiptsP
     setIsUploading(true)
     setStep('sending')
 
-    try {
-      const formData = new FormData()
-      
-      mappings.forEach((mapping, index) => {
-        formData.append('files', mapping.file)
-        formData.append(`employeeIds`, mapping.employeeId)
+    // Simular subida (sin fetch)
+    setTimeout(() => {
+      setResult({
+        success: mappings.length,
+        errors: []
       })
-      
-      formData.append('period', period)
-      formData.append('companyId', companyId)
-
-      const response = await fetch('/api/receipts/upload', {
-        method: 'POST',
-        body: formData
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        setResult({
-          success: data.uploaded,
-          errors: data.errors || []
-        })
-      } else {
-        throw new Error(data.error || 'Error al subir los recibos')
-      }
-    } catch (error) {
-      alert('Error al subir los recibos: ' + (error as Error).message)
-      setStep('mapping')
-    } finally {
       setIsUploading(false)
-    }
+    }, 1500)
   }
 
-  const handleSendAll = async () => {
-    try {
-      const response = await fetch('/api/receipts/send', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ period })
-      })
-
-      if (response.ok) {
-        alert('¡Recibos enviados exitosamente!')
-        router.push('/admin')
-      } else {
-        throw new Error('Error al enviar')
-      }
-    } catch (error) {
-      alert('Error al enviar los recibos')
-    }
+  // SIN async, SIN await, SIN fetch - SOLO simulación
+  const handleSendAll = () => {
+    // Simular envío (sin fetch)
+    setTimeout(() => {
+      alert('¡Recibos enviados exitosamente!')
+      router.push('/admin')
+    }, 1000)
   }
 
   return (

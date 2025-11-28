@@ -1,6 +1,7 @@
 'use client'
 
-import { signOut } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import { logoutUser } from '@/lib/users'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
@@ -28,6 +29,14 @@ interface EmployeeDashboardProps {
 }
 
 export default function EmployeeDashboard({ user, receipts }: EmployeeDashboardProps) {
+  const router = useRouter()
+
+  // SIN async - SOLO logout simple
+  const handleLogout = () => {
+    logoutUser()
+    router.push('/login')
+  }
+
   const getStatusBadge = (status: string) => {
     const badges = {
       PENDING: { color: 'bg-yellow-100 text-yellow-800', icon: Clock, label: 'Pendiente' },
@@ -65,7 +74,7 @@ export default function EmployeeDashboard({ user, receipts }: EmployeeDashboardP
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => signOut({ callbackUrl: '/login' })}
+                onClick={handleLogout}
               >
                 <LogOut size={18} className="mr-2" />
                 Salir

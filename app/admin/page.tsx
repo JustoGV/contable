@@ -1,12 +1,28 @@
-import { auth } from "@/auth"
-import { redirect } from "next/navigation"
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { getCurrentUser } from '@/lib/users'
 import AdminDashboard from "@/components/admin/AdminDashboard"
 
-export default async function AdminPage() {
-  const session = await auth()
+// SIN async, SIN await - SOLO hardcoded
+export default function AdminPage() {
+  const router = useRouter()
+  const [user, setUser] = useState<any>(null)
 
-  if (!session || session.user.role !== 'ADMIN') {
-    redirect('/login')
+  useEffect(() => {
+    const currentUser = getCurrentUser()
+    
+    if (!currentUser || currentUser.role !== 'ADMIN') {
+      router.push('/login')
+      return
+    }
+
+    setUser(currentUser)
+  }, [router])
+
+  if (!user) {
+    return <div className="min-h-screen flex items-center justify-center">Cargando...</div>
   }
 
   // Estadísticas hardcodeadas
@@ -74,7 +90,7 @@ export default async function AdminPage() {
 
   return (
     <AdminDashboard
-      user={session.user}
+      user={user}
       stats={stats}
       recentReceipts={recentReceipts}
     />

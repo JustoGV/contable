@@ -1,12 +1,28 @@
-import { auth } from "@/auth"
-import { redirect } from "next/navigation"
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { getCurrentUser } from '@/lib/users'
 import EmployeeDashboard from "@/components/employee/EmployeeDashboard"
 
-export default async function EmployeePage() {
-  const session = await auth()
+// SIN async, SIN await - SOLO hardcoded
+export default function EmployeePage() {
+  const router = useRouter()
+  const [user, setUser] = useState<any>(null)
 
-  if (!session || session.user.role !== 'EMPLOYEE') {
-    redirect('/login')
+  useEffect(() => {
+    const currentUser = getCurrentUser()
+    
+    if (!currentUser || currentUser.role !== 'EMPLOYEE') {
+      router.push('/login')
+      return
+    }
+
+    setUser(currentUser)
+  }, [router])
+
+  if (!user) {
+    return <div className="min-h-screen flex items-center justify-center">Cargando...</div>
   }
 
   // Recibos hardcodeados
@@ -49,7 +65,7 @@ export default async function EmployeePage() {
 
   return (
     <EmployeeDashboard
-      user={session.user}
+      user={user}
       receipts={receipts}
     />
   )
