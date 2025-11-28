@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -15,6 +15,16 @@ export default function LoginPage() {
     username: '',
     password: ''
   })
+
+  // Limpiar todas las cookies al cargar
+  useEffect(() => {
+    // Eliminar todas las cookies relacionadas con next-auth
+    document.cookie.split(";").forEach((c) => {
+      document.cookie = c
+        .replace(/^ +/, "")
+        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    });
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
